@@ -1,4 +1,5 @@
 ARG IMAGE=ubuntu:20.04
+ARG PREFIX=/usr/local
 
 FROM ${IMAGE} AS builder
 
@@ -23,7 +24,7 @@ COPY scripts/*.sh /usr/bin/
 ARG TAG=nightly
 ARG NEOVIM_VERSION
 
-ARG PREFIX=/usr/local
+ARG PREFIX
 ARG BUILD_TYPE=RelWithDebInfo
 ARG MODE=install
 
