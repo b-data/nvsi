@@ -1,7 +1,13 @@
 *
 
+!/scripts/
+
+!/scripts/*.sh
+
 !/.editorconfig
 !/.gitattributes
 !/.gitignore
+!/.gitlab-ci.yml
+!/build.Dockerfile
 !/LICENSE
 !/README.md
