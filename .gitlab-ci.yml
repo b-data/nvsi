@@ -1,10 +1,14 @@
 .before-script-build: &before-script-build
   - |
-    if [ ! -z "$CI_BUILD_PLATFORMS" ]; then
+    if [ -n "$CI_BUILD_PLATFORMS" ]; then
       export OS_ARCH=$(echo $CI_BUILD_PLATFORMS | tr ' ' '\n' | \
         sed 's|\/||2' | sed 's|\/|-|' | tr '\n' ' ')
     fi
   - export CI_APP_REPO=${CI_APP_REPO:-$CI_REGISTRY_IMAGE}
+  - |
+    if [ -n "$TAG" ]; then
+      export CI_APP_TAG=${TAG#v}
+    fi
   - >
     echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER
     --password-stdin $CI_REGISTRY
@@ -33,14 +37,15 @@ build:version-linux-amd64:
     - >
       docker build
       --build-arg TAG
+      --build-arg NEOVIM_VERSION
       --build-arg BUILD_TYPE=Release
       --build-arg MODE=install-strip
-      -t $CI_APP_REPO:$TAG-linux-amd64
+      -t $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-linux-amd64
       -f build.Dockerfile .
-    - docker push $CI_APP_REPO:$TAG-linux-amd64
+    - docker push $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-linux-amd64
     - |
       if [[ "$TAG_LATEST" == "true" ]]; then
-        docker tag $CI_APP_REPO:$TAG-linux-amd64 \
+        docker tag $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-linux-amd64 \
           $CI_APP_REPO:latest-linux-amd64
         docker push $CI_APP_REPO:latest-linux-amd64
       fi
@@ -60,14 +65,15 @@ build:version-linux-arm64v8:
     - >
       docker build
       --build-arg TAG
+      --build-arg NEOVIM_VERSION
       --build-arg BUILD_TYPE=Release
       --build-arg MODE=install-strip
-      -t $CI_APP_REPO:$TAG-linux-arm64v8
+      -t $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-linux-arm64v8
       -f build.Dockerfile .
-    - docker push $CI_APP_REPO:$TAG-linux-arm64v8
+    - docker push $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-linux-arm64v8
     - |
       if [[ "$TAG_LATEST" == "true" ]]; then
-        docker tag $CI_APP_REPO:$TAG-linux-arm64v8 \
+        docker tag $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-linux-arm64v8 \
           $CI_APP_REPO:latest-linux-arm64v8
         docker push $CI_APP_REPO:latest-linux-arm64v8
       fi
@@ -84,21 +90,21 @@ build-manifest:version-linux-multiarch:
   script:
     - |
       for i in $OS_ARCH; do
-        export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO:$TAG-$i"
+        export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-$i"
       done
     - |
-      docker manifest create $CI_APP_REPO:$TAG $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION} $CI_MANIFEST_LIST
       if echo $OS_ARCH | grep "linux-arm64v8" > /dev/null ; then
-        docker manifest annotate --variant v8 $CI_APP_REPO:$TAG \
-          $CI_APP_REPO:$TAG-linux-arm64v8
+        docker manifest annotate --variant v8 $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION} \
+          $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-linux-arm64v8
       fi
-      docker manifest push $CI_APP_REPO:$TAG
+      docker manifest push $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}
     - |
       if [[ "$TAG_LATEST" == "true" ]]; then
         docker manifest create $CI_APP_REPO:latest $CI_MANIFEST_LIST
         if echo $OS_ARCH | grep "linux-arm64v8" > /dev/null ; then
           docker manifest annotate --variant v8 $CI_APP_REPO:latest \
-            $CI_APP_REPO:$TAG-linux-arm64v8
+            $CI_APP_REPO:${CI_APP_TAG:-$NEOVIM_VERSION}-linux-arm64v8
         fi
         docker manifest push $CI_APP_REPO:latest
       fi
