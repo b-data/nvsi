@@ -8,6 +8,8 @@
 !/.gitattributes
 !/.gitignore
 !/.gitlab-ci.yml
+!/.hadolint.yml
 !/build.Dockerfile
 !/LICENSE
 !/README.md
+!/sample.Dockerfile
