@@ -17,16 +17,25 @@ fi
 
 # Download and extract source code
 cd /tmp
-git clone https://github.com/neovim/neovim.git
+git clone https://gitlab.b-data.ch/neovim/neovim.git
 cd neovim
-git checkout "$TAG"
+git switch --detach "$TAG"
 
 # Build and install
+dpkgArch="$(dpkg --print-architecture)"
 if echo "$MODE" | grep -q ^"install"; then
+  # Build
   make CMAKE_BUILD_TYPE="$BUILD_TYPE"
+  # Strip binaries and libraries
   if [ "$MODE" == "install-strip" ]; then
-    strip build/bin/nvim
+    strip build/bin/nvim build/lib/*.so build/lib/nvim/parser/*.so
   fi
+  # Override package name
+  sed -i "s/nvim-linux64/nvim-linux-$dpkgArch/g" \
+    build/CPackConfig.cmake
+  # Create package
   cpack --config build/CPackConfig.cmake -G TGZ
-  tar zxf build/nvim-linux64.tar.gz -C "$PREFIX" --strip-components=1
+  # Install
+  tar zxf "build/nvim-linux-$dpkgArch.tar.gz" -C "$PREFIX" \
+    --strip-components=1
 fi
