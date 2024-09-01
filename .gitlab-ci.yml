@@ -27,6 +27,8 @@ build:version-linux-amd64:
   tags:
     - arch:amd64
     - os:linux
+    - executor:docker
+    - privileged:true
   script:
     - >
       docker build
@@ -52,6 +54,8 @@ build:version-linux-arm64v8:
   tags:
     - arch:arm64/v8
     - os:linux
+    - executor:docker
+    - privileged:true
   script:
     - >
       docker build
@@ -75,6 +79,8 @@ build:version-linux-arm64v8:
 build-manifest:version-linux-multiarch:
   extends: .build
   needs: ["build:version-linux-amd64", "build:version-linux-arm64v8"]
+  tags:
+    - executor:docker
   script:
     - |
       for i in $OS_ARCH; do
@@ -106,6 +112,8 @@ build:nightly-linux-amd64:
   tags:
     - arch:amd64
     - os:linux
+    - executor:docker
+    - privileged:true
   script:
     - >
       docker build
@@ -122,6 +130,8 @@ build:nightly-linux-arm64v8:
   tags:
     - arch:arm64/v8
     - os:linux
+    - executor:docker
+    - privileged:true
   script:
     - >
       docker build
@@ -136,6 +146,8 @@ build:nightly-linux-arm64v8:
 build-manifest:nightly-linux-multiarch:
   extends: .build
   needs: ["build:nightly-linux-amd64", "build:nightly-linux-arm64v8"]
+  tags:
+    - executor:docker
   script:
     - |
       for i in $OS_ARCH; do
