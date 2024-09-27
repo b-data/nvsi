@@ -32,10 +32,15 @@ RUN start.sh
 
 FROM scratch
 
-LABEL org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.source="https://gitlab.b-data.ch/neovim/nvsi" \
-      org.opencontainers.image.vendor="b-data GmbH" \
-      org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
+ARG IMAGE_LICENSE="MIT"
+ARG IMAGE_SOURCE="https://gitlab.b-data.ch/neovim/nvsi"
+ARG IMAGE_VENDOR="b-data GmbH"
+ARG IMAGE_AUTHORS="Olivier Benz <olivier.benz@b-data.ch>"
+
+LABEL org.opencontainers.image.licenses="$IMAGE_LICENSE" \
+      org.opencontainers.image.source="$IMAGE_SOURCE" \
+      org.opencontainers.image.vendor="$IMAGE_VENDOR" \
+      org.opencontainers.image.authors="$IMAGE_AUTHORS"
 
 ARG PREFIX
 

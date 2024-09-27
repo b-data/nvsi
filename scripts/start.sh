@@ -35,6 +35,9 @@ if echo "$MODE" | grep -q ^"install"; then
     build/CPackConfig.cmake
   # Create package
   cpack --config build/CPackConfig.cmake -G TGZ
+  # SHA256 checksum
+  sha256sum "build/nvim-linux-$dpkgArch.tar.gz" \
+    > "build/nvim-linux-$dpkgArch.tar.gz.sha256"
   # Install
   tar zxf "build/nvim-linux-$dpkgArch.tar.gz" -C "$PREFIX" \
     --strip-components=1
