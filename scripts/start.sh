@@ -33,6 +33,10 @@ if echo "$MODE" | grep -q ^"install"; then
   # Override package name
   sed -i "s/nvim-linux64/nvim-linux-$dpkgArch/g" \
     build/CPackConfig.cmake
+  sed -i "s/nvim-linux-x86_64/nvim-linux-$dpkgArch/g" \
+    build/CPackConfig.cmake
+  sed -i "s/nvim-linux-aarch64/nvim-linux-$dpkgArch/g" \
+    build/CPackConfig.cmake
   # Create package
   cpack --config build/CPackConfig.cmake -G TGZ
   # SHA256 checksum
